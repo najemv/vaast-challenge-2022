@@ -22,7 +22,7 @@ const TravelMap = ({objects, travels}: TravelMapProps) => {
     //console.log(x, y);
     return <circle
         cx={x * width} cy={y * height}
-        r={1} stroke="red"
+        r={3} stroke="red"
         fill={"red"}
         key={key}
       >
