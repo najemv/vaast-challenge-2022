@@ -1,9 +1,9 @@
-export type Point = {
+export type Position = {
   x: number;
   y: number;
 };
 
-export type Polygon = Point[];
+export type Polygon = Position[];
 
 export type TravelPurpose = 
   "Coming Back From Restaurant" |
@@ -30,11 +30,10 @@ export type Travel = {
   participantId: number;
   travelStartTime: string;
   travelStartLocationId: number | null;
-  travelEndTime: string;
+  travelDuration: number;
   travelEndLocationId: number;
   purpose: TravelPurpose;
-  checkInTime: string;
-  checkOutTime: string;
+  destinationTimeSpend: number;
   moneySpend: number;
 };
 
@@ -52,7 +51,7 @@ export type Participant = {
 export type Place = {
   placeType: "Apartment" | "School" | "Restaurant" | "Pub" | "Employer";
   placeId: number;
-  location: Point;
+  location: Position;
   buildingId: number;
   travels: number[];
 };
@@ -68,7 +67,8 @@ export type School = Place & {
   maxEnrollment: number;
 };
 
-export type Restaunrat = Place & {
+
+export type Restaurant = Place & {
   foodCost: number;
   maxOccupancy: number;
   visits: number[];

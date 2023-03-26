@@ -1,10 +1,11 @@
 import './App.css';
+import RestaurantVisitsSection from './sections/PlaceVisitsSections/RestaurantVisitsSection';
 
 function App() {
   
   // sections
   return (
-    <div>test 2</div>
+    <RestaurantVisitsSection />
   )
 }
 

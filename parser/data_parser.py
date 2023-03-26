@@ -1,6 +1,7 @@
 import json
 import csv
 import os
+from datetime import datetime, timedelta
 
 DATA_DIR = "..\\VAST-Challenge-2022\\Datasets"
 OUTPUT_DIR = "src\\assets\\data"
@@ -47,6 +48,12 @@ def parse_id(id: str):
     return int(id)
   return None
 
+def parse_time_interval(interval_end_time: str, interval_start_time: str):
+  date_format = "%Y-%m-%dT%H:%M:%SZ"
+  start = datetime.strptime(interval_start_time, date_format)
+  end = datetime.strptime(interval_end_time, date_format)
+  delta = end - start
+  return delta.seconds // 60
 
 
 ## DATA PARSING
@@ -181,17 +188,18 @@ def parse_and_bind_travels(places, participants):
         "participantId": int(data[0]),
         "travelStartTime": data[1],
         "travelStartLocationId": parse_id(data[2]),
-        "travelEndTime": data[3],
+        "travelDuration": parse_time_interval(data[3], data[1]),
         "travelEndLocationId": parse_id(data[4]),
         "purpose": data[5],
-        "checkInTime": data[6],
-        "checkOutTime": data[7],
+        "destinationTimeSpend": parse_time_interval(data[7], data[6]),
         "moneySpend": float(data[8]) - float(data[9])
       }
       
       place_dest = places[travel_record["travelEndLocationId"]]
       if place_dest["placeType"] in ("Restaurant", "Pub"):
         travels.append(travel_record)
+
+  travels.sort(key=lambda x: x["travelStartTime"])
   
   # bind restaurant/pub travels to places and participants
   for i, travel in enumerate(travels):
