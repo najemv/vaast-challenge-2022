@@ -2,13 +2,15 @@ import json
 import csv
 import os
 
-data_dir = "..\\..\\VAST-Challenge-2022\\Datasets"
-output_dir = "..\\public\\data"
+DATA_DIR = "..\\VAST-Challenge-2022\\Datasets"
+OUTPUT_DIR = "src\\assets\\data"
 
-logs_dir = data_dir + "\\Activity Logs"
-attributes_dir = data_dir + "\\Attributes"
-journals_dir = data_dir + "\\Journals"
+LOGS_DIR = DATA_DIR + "\\Activity Logs"
+ATTRIBUTES_DIR = DATA_DIR + "\\Attributes"
+JOURNALS_DIR = DATA_DIR + "\\Journals"
 
+
+## HELPERS
 
 def parse_point(point: str):
   x, y = point.split(" ")
@@ -17,8 +19,10 @@ def parse_point(point: str):
     "y": float(y)
   }
 
+
 def parse_location(location: str):
   return parse_point(location[7:-1])
+
 
 def parse_polygons(data: str):
   polygons = data[11:-2].split("), (")
@@ -27,23 +31,30 @@ def parse_polygons(data: str):
     result.append(list(map(lambda x: parse_point(x), polygon.split(", "))))
   return result
 
+
 def parse_units(units: str):
   if len(units) == 0:
     return []
   return list(map(lambda x: int(x), units[1:-1].split(",")))
 
+
 def parse_days(days: str):
   return days[1:-1].split(",")
+
 
 def parse_id(id: str):
   if id.isdecimal():
     return int(id)
-  return -1
+  return None
+
+
+
+## DATA PARSING
 
 def parse_participants():
   result = []
 
-  with open(attributes_dir + "\\Participants.csv") as f:
+  with open(ATTRIBUTES_DIR + "\\Participants.csv") as f:
     reader = csv.reader(f)
     next(reader)
     for line in reader:
@@ -54,16 +65,17 @@ def parse_participants():
         "age": int(line[3]),
         "educationLevel": line[4],
         "interestGroup": line[5],
-        "joviality": line[6]
+        "joviality": line[6],
+        "travels" : []
       })
 
-  with open(output_dir + "\\participants.json", "w") as f:
-    json.dump(result, f, indent=2)
+  return result
+
 
 def parse_buildings():
   result = []
 
-  with open(attributes_dir + "\\Buildings.csv") as f:
+  with open(ATTRIBUTES_DIR + "\\Buildings.csv") as f:
     reader = csv.reader(f)
     next(reader)
     for line in reader:
@@ -75,35 +87,13 @@ def parse_buildings():
         "units": parse_units(line[4])
       })
 
-  with open(output_dir + "\\buildings.json", "w") as f:
-    json.dump(result, f, indent=2)
+  return result
   
-
-def parse_jobs():
-  result = []
-
-  with open(attributes_dir + "\\Jobs.csv") as f:
-    reader = csv.reader(f)
-    next(reader)
-    for data in reader:
-      result.append({
-        "jobId": int(data[0]),
-        "employerId": int(data[1]),
-        "hourlyRate": float(data[2]),
-        "startTime": data[3],
-        "endTime": data[4],
-        "daysToWork": parse_days(data[5]),
-        "educationRequirement": data[6]
-      })
-  
-  with open(output_dir + "\\jobs.json", "w") as f:
-    json.dump(result, f, indent=2)
-
 
 def parse_places():
   result = []
 
-  with open(attributes_dir + "\\Apartments.csv") as f:
+  with open(ATTRIBUTES_DIR + "\\Apartments.csv") as f:
     f.readline()
     for line in f:
       data = line.split(",")
@@ -114,10 +104,11 @@ def parse_places():
         "maxOccupancy": int(data[2]),
         "numberOfRooms": int(data[3]),
         "location": parse_location(data[4]),
-        "buildingId": int(data[5])
+        "buildingId": int(data[5]),
+        "travels": []
       })
   
-  with open(attributes_dir + "\\Schools.csv") as f:
+  with open(ATTRIBUTES_DIR + "\\Schools.csv") as f:
     f.readline()
     for line in f:
       data = line.split(",")
@@ -127,10 +118,11 @@ def parse_places():
         "monthlyCost": float(data[1]),
         "maxEnrollment": int(data[2]),
         "location": parse_location(data[3]),
-        "buildingId": int(data[4])
+        "buildingId": int(data[4]),
+        "travels": []
       })
 
-  with open(attributes_dir + "\\Restaurants.csv") as f:
+  with open(ATTRIBUTES_DIR + "\\Restaurants.csv") as f:
     f.readline()
     for line in f:
       data = line.split(",")
@@ -141,10 +133,11 @@ def parse_places():
         "maxOccupancy": int(data[2]),
         "location": parse_location(data[3]),
         "buildingId": int(data[4]),
-        "visits": []
+        "visits": [],
+        "travels": []
       })
 
-  with open(attributes_dir + "\\Pubs.csv") as f:
+  with open(ATTRIBUTES_DIR + "\\Pubs.csv") as f:
     f.readline()
     for line in f:
       data = line.split(",")
@@ -155,10 +148,11 @@ def parse_places():
         "maxOccupancy": int(data[2]),
         "location": parse_location(data[3]),
         "buildingId": int(data[4]),
-        "visits": []
+        "visits": [],
+        "travels": []
       })
 
-  with open(attributes_dir + "\\Employers.csv") as f:
+  with open(ATTRIBUTES_DIR + "\\Employers.csv") as f:
     f.readline()
     for line in f:
       data = line.split(",")
@@ -166,30 +160,20 @@ def parse_places():
         "placeType": "Employer",
         "placeId": int(data[0]),
         "location": parse_location(data[1]),
-        "buildingId": int(data[2])
+        "buildingId": int(data[2]),
+        "travels": []
       })
 
   result.sort(key=lambda x: x["placeId"])
 
-  # fill missing jobs to employers
-  # with open(attributes_dir + "\\Jobs.csv") as f:
-  #   reader = csv.reader(f)
-  #   next(reader)
-  #   for data in reader:
-  #     job = {
-  #       "jobId": int(data[0]),
-  #       "employerId": int(data[1]),
-  #       "hourlyRate": float(data[2]),
-  #       "startTime": data[3],
-  #       "endTime": data[4],
-  #       "daysToWork": parse_days(data[5]),
-  #       "educationRequirement": data[6]
-  #     }
-  #     
-  #     result[job["jobId"]["jobs"].append(job)
+  return result
 
-  # fill the travels to the restaurants and pubs
-  with open(journals_dir + "\\TravelJournal.csv") as f:
+
+def parse_and_bind_travels(places, participants):
+  travels = []
+
+  # select only places that ends in restaurant/pubs (to save memory)
+  with open(JOURNALS_DIR + "\\TravelJournal.csv") as f:
     f.readline()
     for line in f:
       data = line.split(",")
@@ -204,25 +188,48 @@ def parse_places():
         "checkOutTime": data[7],
         "moneySpend": float(data[8]) - float(data[9])
       }
-
-      place = result[travel_record["travelEndLocationId"]]
-      # todo: maybe some other filtering (purpose) ??
-      if place["placeType"] in ("Restaurant", "Pub"):
-        place["visits"].append(travel_record)
+      
+      place_dest = places[travel_record["travelEndLocationId"]]
+      if place_dest["placeType"] in ("Restaurant", "Pub"):
+        travels.append(travel_record)
   
+  # bind restaurant/pub travels to places and participants
+  for i, travel in enumerate(travels):
+    place_dest = places[travel["travelEndLocationId"]]
+    place_dest["visits"].append(i)
 
-  with open(output_dir + "\\places.json", "w") as f:
-    json.dump(result, f, indent=2)
+    if travel["travelStartLocationId"] is not None:
+      place_start = places[travel["travelStartLocationId"]]
+      place_start["travels"].append(i)
+
+    participant = participants[travel["participantId"]]
+    participant["travels"].append(i)
+  
+  return travels
+    
+
+def write_json(obj, filename):
+  print(f'Writing to "{filename}.json" has started...')
+  with open(OUTPUT_DIR + f"\\{filename}.json", "w") as f:
+    json.dump(obj, f, indent=2)
+  print(f'Writing to "{filename}.json" has finished.')
 
 
 def main():
-  if not os.path.exists(output_dir):
-    os.mkdir(output_dir)
+  if not os.path.exists(OUTPUT_DIR):
+    os.mkdir(OUTPUT_DIR)
   
-  parse_places()
-  parse_buildings()
-  #parse_jobs()
-  parse_participants()
+  places = parse_places()
+  buildings = parse_buildings()
+  participants = parse_participants()
+
+  travels = parse_and_bind_travels(places, participants)
+
+  write_json(participants, "participants")
+  write_json(buildings, "buildings")
+  write_json(places, "places")
+  write_json(travels, "travels")
+
 
 if __name__ == '__main__':
   main()
