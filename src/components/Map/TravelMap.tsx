@@ -5,7 +5,7 @@ import cityMap from "/city_map.png";
 
 interface TravelMapProps {
   objects: Restaurant[] | Pub[];
-  travels: number[][];
+  travels: number[][][];
 }
 
 const TravelMap = ({objects, travels}: TravelMapProps) => {
@@ -29,16 +29,17 @@ const TravelMap = ({objects, travels}: TravelMapProps) => {
       </circle>;
   });
 
-  const travelElements = travels.map((objectTravels, objectIndex) => {
-    return objectTravels.map((travelId, travelIndex) => {
-      const travel = TRAVELS[travelId];
-      if (travel.travelStartLocationId === null) {
-        return <p></p>;
-      }
-      const startLocation = PLACES[travel.travelStartLocationId];
+  const maxTravels = Math.max(...travels.flat().map(travelByPlaceStart => travelByPlaceStart.length));
+  const travelElements = travels.map((objectTravelsByPlace, objectIndex) => {
+    return objectTravelsByPlace.map((travelIds, travelIndex) => {
+      const travelCount = travelIds.length;
+
+      const travel = TRAVELS[travelIds[0]];
+      const startLocation = PLACES[travel.travelStartLocationId as number];
       const endLocation = PLACES[travel.travelEndLocationId];
       const lineStart = transformPosition(startLocation.location);
       const lineEnd = transformPosition(endLocation.location);
+
       const key = `obj-${objectIndex}-travel-${travelIndex}`;
       return <line
           x1={lineStart.x * width}
@@ -47,12 +48,11 @@ const TravelMap = ({objects, travels}: TravelMapProps) => {
           y2={lineEnd.y * height}
           stroke="red"
           strokeWidth={1}
+          opacity={travelCount / maxTravels}
           key={key}
         />
     })
   }).flat();
-
-  console.log(travelElements);
 
   return (
     <div>

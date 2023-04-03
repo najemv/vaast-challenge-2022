@@ -45,7 +45,7 @@ export type Participant = {
   educationLevel: EducationLevel;
   interestGroup: InterestGroup;
   joviality: number;
-  travels: number[];
+  travels: number[][];
 };
 
 export type Place = {
@@ -53,7 +53,7 @@ export type Place = {
   placeId: number;
   location: Position;
   buildingId: number;
-  travels: number[];
+  travels: number[][];
 };
 
 export type Apartment = Place & {
@@ -71,13 +71,15 @@ export type School = Place & {
 export type Restaurant = Place & {
   foodCost: number;
   maxOccupancy: number;
-  visits: number[];
+  visits: number[][];
+  unknownVisits: number[];
 };
 
 export type Pub = Place & {
   hourlyCost: number;
   maxOccupancy: number;
-  visits: number[];
+  visits: number[][];
+  unknownVisits: number[];
 };
 
 export type Employer = Place & {

@@ -97,7 +97,7 @@ def parse_buildings():
   return result
   
 
-def parse_places():
+def parse_places(participants):
   result = []
 
   with open(ATTRIBUTES_DIR + "\\Apartments.csv") as f:
@@ -141,6 +141,7 @@ def parse_places():
         "location": parse_location(data[3]),
         "buildingId": int(data[4]),
         "visits": [],
+        "unknownVisits": [],
         "travels": []
       })
 
@@ -156,7 +157,9 @@ def parse_places():
         "location": parse_location(data[3]),
         "buildingId": int(data[4]),
         "visits": [],
+        "unknownVisits": [],
         "travels": []
+        
       })
 
   with open(ATTRIBUTES_DIR + "\\Employers.csv") as f:
@@ -172,6 +175,15 @@ def parse_places():
       })
 
   result.sort(key=lambda x: x["placeId"])
+
+  # initialize array of visits and travels by correct size
+  for place in result:
+    place["travels"] = [[] for _ in range(len(result))]
+    if "visits" in place:
+      place["visits"] = [[] for _ in range(len(result))]
+
+  for participant in participants:
+    participant["travels"] = [[] for _ in range(len(result))]
 
   return result
 
@@ -204,14 +216,17 @@ def parse_and_bind_travels(places, participants):
   # bind restaurant/pub travels to places and participants
   for i, travel in enumerate(travels):
     place_dest = places[travel["travelEndLocationId"]]
-    place_dest["visits"].append(i)
-
+    
     if travel["travelStartLocationId"] is not None:
       place_start = places[travel["travelStartLocationId"]]
-      place_start["travels"].append(i)
+
+      place_start["travels"][place_dest["placeId"]].append(i)
+      place_dest["visits"][place_start["placeId"]].append(i)
+    else:
+      place_dest["unknownVisits"].append(i)
 
     participant = participants[travel["participantId"]]
-    participant["travels"].append(i)
+    participant["travels"][place_dest["placeId"]].append(i)
   
   return travels
     
@@ -227,10 +242,9 @@ def main():
   if not os.path.exists(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
   
-  places = parse_places()
-  buildings = parse_buildings()
   participants = parse_participants()
-
+  places = parse_places(participants)
+  buildings = parse_buildings()
   travels = parse_and_bind_travels(places, participants)
 
   write_json(participants, "participants")
