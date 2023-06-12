@@ -1,11 +1,10 @@
-import { DateTimeFilterChangeEvent } from "../components/Input/DateTimeFilter";
+import { DateTimeFilterChangeEvent } from "../components/Input/Datetime/DateTimeFilter";
 import { TRAVELS } from "../data/data";
 
 
 export const getVisitsByTimeInterval = (visitsIds: number[][], params: DateTimeFilterChangeEvent) => {
   const dateFrom = new Date(params.dateSpan.dateFrom);
   const dateTo = new Date(params.dateSpan.dateTo);
-  console.log(dateFrom, dateTo);
   return visitsIds.map(visitsForPlace => {
     return visitsForPlace.filter(id => {
       // mid travel time

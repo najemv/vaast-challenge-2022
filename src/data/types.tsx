@@ -44,8 +44,9 @@ export type Participant = {
   age: number;
   educationLevel: EducationLevel;
   interestGroup: InterestGroup;
-  joviality: number;
+  joviality: string;
   travels: number[][];
+  budget: number;
 };
 
 export type Place = {

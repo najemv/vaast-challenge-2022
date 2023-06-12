@@ -9,7 +9,7 @@ interface OptionSwitchProps {
 const OptionSwitch = ({onChange, leftLabel, rightLabel}: OptionSwitchProps) => {
 
   return (
-    <div>
+    <div className="slider--wrapper">
       <span>{leftLabel}</span>
       <label className="switch">
         <input type="checkbox" onChange={(e) => onChange(e.target.checked)}/>

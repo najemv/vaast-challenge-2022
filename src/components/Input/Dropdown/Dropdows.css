@@ -1,0 +1,14 @@
+
+.dropdown--wrapper {
+  display: flex;
+  gap: 20px;
+  font-size: 1.0rem;
+  align-items: center;
+}
+
+.dropdown {
+  text-align: center;
+  font-size: 1.2rem;
+  border-radius: 20px;
+  padding: 5px 20px;
+}

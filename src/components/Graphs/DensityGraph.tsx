@@ -1,8 +1,11 @@
-import { VictoryArea, VictoryChart, VictoryTheme } from "victory";
+import { VictoryArea, VictoryAxis, VictoryChart } from "victory";
 
 interface DensityGraphProps {
   data: number[];
   bins: number[];
+  xlabel: string;
+  ylabel: string;
+  unit: string;
 }
 
 const getDensity = (data: number[], bins: number[]) => {
@@ -32,25 +35,46 @@ const getDensity = (data: number[], bins: number[]) => {
   return result;
 }
 
-const DensityGraph = ({data, bins}: DensityGraphProps) => {
+const DensityGraph = ({data, bins, xlabel, ylabel, unit}: DensityGraphProps) => {
 
   const density = getDensity(data, bins);
   console.log("after density", density)
   return (
-    <VictoryChart
-      theme={VictoryTheme.material}
-    >
-      <VictoryArea
-        style={{ data: { fill: "#c43a31" } }}
-        data={density.map((num, i) => {
-          return {
-            x: bins[i],
-            y: num
-          }
-        })}
-        scale={{x: "linear", y: "linear"}}
-      />
-    </VictoryChart>
+    <div className="graph__wrapper">
+      <VictoryChart
+        padding={70}
+      >
+        <VictoryAxis
+          label={xlabel}
+          tickFormat={(x) => `<${x} ${unit}`}
+          style={{
+            axisLabel: {
+              padding: 35
+            }
+          }}
+        />
+        <VictoryAxis
+          dependentAxis
+          label={ylabel}
+          style={{
+            axisLabel: {
+              padding: 55
+            }
+          }}
+        /> 
+        <VictoryArea
+          style={{ data: { fill: "#967E76" } }}
+          data={density.map((num, i) => {
+            return {
+              x: bins[i],
+              y: num
+            }
+          })}
+          scale={{x: "linear", y: "linear"}}
+        />
+      </VictoryChart>
+    </div>
+
   );
 };
 

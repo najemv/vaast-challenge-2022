@@ -1,0 +1,49 @@
+
+section.top {
+  margin-top: 32px;
+}
+
+section.bottom {
+  margin-bottom: 32px;
+}
+
+section.text {
+  text-align: justify;
+}
+
+.section--split {
+  display: flex;
+  gap: 16px 16px;
+  flex-direction: row;
+}
+
+.section--split > * {
+  width: 50%;
+}
+
+@media only screen and (max-width: 960px) {
+  .section--split {
+    flex-direction: column;
+  }
+  
+  .section--split > * {
+    width: 100%;
+  }
+}
+
+section.small {
+  max-width: 960px;
+}
+
+section.medium {
+  max-width: 1280px;
+}
+
+section.big {
+  max-width: 100%;
+}
+
+section {
+  margin: 0 auto 0 auto;
+  padding: 20px;
+}

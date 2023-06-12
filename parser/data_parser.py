@@ -73,8 +73,21 @@ def parse_participants():
         "educationLevel": line[4],
         "interestGroup": line[5],
         "joviality": line[6],
-        "travels" : []
+        "travels" : [],
+        "budget": 0
       })
+
+  # fill budget data as theirs first balance
+  with open(LOGS_DIR + "\\ParticipantStatusLogs1.csv") as f:
+    reader = csv.reader(f)
+    next(reader)
+    for line in reader:
+      participantId = int(line[2])
+      availableBalance = float(line[7])
+
+      if result[participantId]["budget"] == 0:
+        print(participantId, " was set")
+        result[participantId]["budget"] = availableBalance
 
   return result
 
@@ -97,7 +110,7 @@ def parse_buildings():
   return result
   
 
-def parse_places(participants):
+def parse_places(participants, buldings):
   result = []
 
   with open(ATTRIBUTES_DIR + "\\Apartments.csv") as f:
@@ -243,8 +256,8 @@ def main():
     os.mkdir(OUTPUT_DIR)
   
   participants = parse_participants()
-  places = parse_places(participants)
   buildings = parse_buildings()
+  places = parse_places(participants, buildings)
   travels = parse_and_bind_travels(places, participants)
 
   write_json(participants, "participants")
